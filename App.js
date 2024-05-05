@@ -15,7 +15,7 @@ export default function App() {
         />
         <TextInput
           style={styles.input}
-          placeholder="Contraseña"
+          placeholder="Contraseña y clave"
           secureTextEntry
           autoCapitalize="none"
         />
