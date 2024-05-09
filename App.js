@@ -1,77 +1,100 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { NavigationContainer } from '@react-navigation/native'; 
+import { createStackNavigator } from '@react-navigation/stack';
+import { Ionicons } from '@expo/vector-icons';
+import RegistroPacientes from './RegistroPacientes';
+import GestionPacientes from './GestionPacientes';
+import HomeScreen from './HomeScreen';
+import Login from './Login';
+import RegistroDoctores from './RegistroDoctores.js';
+import GestionDoctores from './GestionDoctores.js';
 
-export default function App() {
+const Stack = createStackNavigator();
+
+const App = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  }
+
   return (
-    <View style={styles.container}>
-      <Image source={require('./assets/background.jpg')} style={styles.backgroundImage} />
-      <View style={styles.loginContainer}>
-        <Text style={styles.title}>Asilo Nueva Esperanza</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Correo electrónico"
-          keyboardType="email-address"
-          autoCapitalize="none"
+     <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen
+          name="Login"
+          component={Login}
+          options={{ headerShown: false }}
         />
-        <TextInput
-          style={styles.input}
-          placeholder="Contraseña y clave"
-          secureTextEntry
-          autoCapitalize="none"
+        <Stack.Screen
+          name="Home"
+          component={HomeScreen}
+          options={{ headerShown: false }}
         />
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Iniciar sesión</Text>
-        </TouchableOpacity>
-      </View>
-      <StatusBar style="auto" />
-    </View>
+        <Stack.Screen
+          name="Form"
+          component={RegistroPacientes}
+          options={{
+            title: 'Registro Pacientes',
+            headerStyle: {
+              backgroundColor: 'black',
+            },
+            headerTintColor: 'white',
+            headerBackTitleVisible: false,
+            headerBackImage: () => (
+              <Ionicons name="arrow-back" size={24} color="orange" />
+            ),
+          }}
+        />
+        <Stack.Screen
+          name="GestionPacientes"
+          component={GestionPacientes}
+          options={{
+            title: 'Gestion de pacientes',
+            headerStyle: {
+              backgroundColor: 'black',
+            },
+            headerTintColor: 'white',
+            headerBackTitleVisible: false,
+            headerBackImage: () => (
+              <Ionicons name="arrow-back" size={24} color="orange" />
+            ),
+          }}
+        />
+        <Stack.Screen
+          name="RegistroDoctores"
+          component={RegistroDoctores}
+          options={{
+            title: 'Registro de doctores',
+            headerStyle: {
+              backgroundColor: 'black',
+            },
+            headerTintColor: 'white',
+            headerBackTitleVisible: false,
+            headerBackImage: () => (
+              <Ionicons name="arrow-back" size={24} color="orange" />
+            ),
+          }}
+        />
+        <Stack.Screen
+          name="GestionDoctores"
+          component={GestionDoctores}
+          options={{
+            title: 'Gestion de doctores',
+            headerStyle: {
+              backgroundColor: 'black',
+            },
+            headerTintColor: 'white',
+            headerBackTitleVisible: false,
+            headerBackImage: () => (
+              <Ionicons name="arrow-back" size={24} color="orange" />
+            ),
+          }}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
+
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  backgroundImage: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
-  },
-  loginContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.7)',
-    padding: 20,
-    borderRadius: 5,
-    width: '80%',
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    padding: 10,
-    marginBottom: 10,
-    width: '100%',
-  },
-  button: {
-    backgroundColor: '#4CAF50',
-    padding: 10,
-    borderRadius: 5,
-    alignItems: 'center',
-    width: '100%',
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-});
+export default App;
