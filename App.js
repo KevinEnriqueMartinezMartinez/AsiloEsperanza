@@ -8,6 +8,8 @@ import HomeScreen from './HomeScreen';
 import Login from './Login';
 import RegistroDoctores from './RegistroDoctores.js';
 import GestionDoctores from './GestionDoctores.js';
+import RegistroCitas from './RegistroCitas.js';
+import GestionCita from './GestionCita.js';
 
 const Stack = createStackNavigator();
 
@@ -91,7 +93,43 @@ const App = () => {
             ),
           }}
         />
+
+
+
+        <Stack.Screen
+          name="RegistroCitas"
+          component={RegistroCitas}
+          options={{
+            title: 'Registro de citas',
+            headerStyle: {
+              backgroundColor: 'black',
+            },
+            headerTintColor: 'white',
+            headerBackTitleVisible: false,
+            headerBackImage: () => (
+              <Ionicons name="arrow-back" size={24} color="orange" />
+            ),
+          }}
+        />
+         <Stack.Screen
+          name="GestionCita"
+          component={GestionCita}
+          options={{
+            title: 'Gestion de citas',
+            headerStyle: {
+              backgroundColor: 'black',
+            },
+            headerTintColor: 'white',
+            headerBackTitleVisible: false,
+            headerBackImage: () => (
+              <Ionicons name="arrow-back" size={24} color="orange" />
+            ),
+          }}
+        />
+        
+        
       </Stack.Navigator>
+      
     </NavigationContainer>
 
   );
