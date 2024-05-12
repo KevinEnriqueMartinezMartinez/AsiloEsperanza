@@ -9,6 +9,7 @@ export default function App() {
   const [categoriaCita, setCategoriaCita] = useState('');
   const [observacion, setObservacion] = useState('');
 
+// trae los datos de las constantes de arriba.
   const handleRegistro = () => {
     console.log('Fecha de Cita:', fechaCita);
     console.log('Nombre del paciente:', nombrePaciente);
@@ -38,7 +39,7 @@ export default function App() {
     color: 'black',
     fontWeight: 'bold',
   };
-
+//retorna a la vista
   return (
     <View style={{ flex: 1, backgroundColor: 'white', justifyContent: 'center', padding: 20 }}>
       <View style={{ backgroundColor: 'lightgray', borderRadius: 15, padding: 20 }}>

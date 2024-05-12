@@ -8,7 +8,7 @@ import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
 
 
-import firebase from '../database/firebase'; // Inicializa la conexi�n
+import firebase from '../database/firebase'; // Inicializa la conexion
 import { AuthSession } from 'expo';
 
 export default function App() {
@@ -18,7 +18,7 @@ export default function App() {
 
 
 
-
+// funcion sincrona para loguearse al metodo auth de firebase
   const handleLogin = async () => {
     if (email !== '' || password !== '') {
     try {
@@ -28,7 +28,7 @@ export default function App() {
         '',
         'Bienvenido Asilo Nueva Esperanza',
         [
-         // { text: 'Cancelar', onPress: () => console.log('Cancelar') },
+         
           { text: 'Aceptar', onPress: () => console.log('Aceptar') }
         ],
         { cancelable: false }
@@ -45,10 +45,10 @@ export default function App() {
 
   const handleGoogleLogin = async () => {
     try {
-      // Configurar el cliente de autenticaci�n con Google
+      // Configuraracion del cliente con Google
       Google.setClientId('186549304054-fl8898qg611oc6ileqpkln8c60b67ifs.apps.googleusercontent.com');
   
-      // Abrir la ventana de inicio de sesi�n de Google
+      // Abre la ventana de inicio de sesion de Google
       const redirectUrl = await WebBrowser.openAuthSessionAsync(
         `https://accounts.google.com/o/oauth2/v2/auth?client_id=${Google.clientId}&redirect_uri=${encodeURIComponent(
           WebBrowser.maybeCompleteAuthSession().url
@@ -56,19 +56,19 @@ export default function App() {
       );
   
       if (redirectUrl.type === 'success') {
-        // Analizar el token de acceso de la URL de redireccionamiento
+        // Analiza el token de acceso de la URL de redireccionamiento
         const accessToken = redirectUrl.params.access_token;
   
-        // Autenticar con Firebase usando el token de acceso
+        // Autenticacion con Firebase usando el token de acceso
         const credential = firebase.firebase.auth.GoogleAuthProvider.credential(null, accessToken);
         await firebase.firebase.auth().signInWithCredential(credential);
-        console.error('Inicio de sesi�n con Google exitoso');
+        console.error('Inicio de sesion con Google exitoso');
         navigation.navigate('Home');
       } else {
-        console.error('Inicio de sesi�n con Google cancelado');
+        console.error('Inicio de sesion con Google cancelado');
       }
     } catch (error) {
-      console.error('Error al iniciar sesi�n con Google:', error);
+      console.error('Error al iniciar sesion con Google:', error);
     }
   };
   

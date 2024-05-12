@@ -9,6 +9,7 @@ export default function App() {
   const [categoriaCita, setCategoriaCita] = useState('');
   const [fechaSeleccionada, setFechaSeleccionada] = useState('');
 
+  // muestra el resultado de las constantes
   const handleRegistro = () => {
     console.log('Nombre del Paciente:', nombrePaciente);
     console.log('Nombre del Doctor:', nombreDoctor);
@@ -20,7 +21,7 @@ export default function App() {
   const handleDateSelect = (day) => {
     setFechaSeleccionada(day.dateString);
   };
-
+// retorna a la vista
   return (
     <View style={{ flex: 1, padding: 20 }}>
       <Calendar
@@ -98,7 +99,7 @@ export default function App() {
     </View>
   );
 }
-
+// estilos
 const styles = {
   inputStyle: {
     padding: 5,

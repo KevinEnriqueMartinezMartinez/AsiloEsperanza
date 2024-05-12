@@ -20,7 +20,7 @@ const HomeScreen = ({ navigation }) => {
     </View>
   );
 };
-
+//estilos
 const styles = StyleSheet.create({
   container: {
     flex: 1,

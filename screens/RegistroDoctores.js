@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity } from 'react-native';
 
-import firebase from '../database/firebase'; // Inicializa la conexión
+import firebase from '../database/firebase'; // Inicializa la conexion
 
 export default function App() {
 
@@ -24,18 +24,18 @@ export default function App() {
       nombre: nombre,
     })
     .then(() => {
-      console.log('Médico registrado correctamente!');
-      // Aquí podrías mostrar un mensaje de éxito o redireccionar a otra pantalla
+      console.log('Medico registrado correctamente!');
+      
     })
     .catch((error) => {
-      console.error('Error al registrar médico: ', error);
-      // Aquí podrías mostrar un mensaje de error al usuario
+      console.error('Error al registrar medico: ', error);
+      
     });
   };
 
 
 
-
+// estilos
   const inputStyle = {
     padding: 5,
     borderWidth: 1,
@@ -56,7 +56,7 @@ export default function App() {
     color: 'black',
     fontWeight: 'bold',
   };
-
+// retorna a la vista
   return (
     <View style={{ flex: 1, backgroundColor: 'white', justifyContent: 'center', padding: 20 }}>
       <View style={{ backgroundColor: 'lightgray', borderRadius: 15, padding: 20 }}>

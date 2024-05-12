@@ -13,6 +13,7 @@ const TopBar = ({ title, onPressMenu }) => {
   );
 }
 
+// estilos
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',

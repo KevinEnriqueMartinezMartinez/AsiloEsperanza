@@ -4,11 +4,10 @@ import { View, Text, TextInput, TouchableOpacity } from 'react-native';
 export default function App() {
   const [especialidad, setEspecialidad] = useState('');
   const [estado, setEstado] = useState('');
-
+// manda a llamar los datos de las constantes.
   const handleFiltrar = () => {
     console.log('Especialidad:', especialidad);
     console.log('Estado:', estado);
-    //  lógica para filtrar los datos según la especialidad y el estado
   };
 
   const inputStyle = {
@@ -84,7 +83,8 @@ export default function App() {
           <Text style={{ fontWeight: 'bold' }}>Apellido</Text>
           <Text style={{ fontWeight: 'bold' }}>JVPM</Text>
         </View>
-        {/* Fila de datos estáticos */}
+
+        {/* datos estáticos */}
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 5 }}>
           <Text>{datoEstatico.nombreDoctor}</Text>
           <Text>{datoEstatico.apellido}</Text>

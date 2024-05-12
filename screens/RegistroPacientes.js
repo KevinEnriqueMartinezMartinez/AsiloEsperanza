@@ -8,7 +8,7 @@ import {
   Pressable,
 } from 'react-native';
 
-import firebase from '../database/firebase'; // Inicializa la conexión
+import firebase from '../database/firebase'; // Inicializa la conexion
 
 const RegistroPacientes = () => {
   const [nombre, setNombre] = useState('');
@@ -24,22 +24,22 @@ const RegistroPacientes = () => {
     firebase.db.collection('Paciente').add({
       dui: dui,
       nombre: nombre,
-      edad: parseInt(edad), // Convertir a número
-      dirrecion: direccion, // Corregir el nombre del campo
-      peso: parseInt(peso), // Convertir a número
-      familiar: nombreContacto, // Utilizar el campo 'familiar' para nombre del contacto
-      numero: parseInt(numeroContacto), // Convertir a número
+      edad: parseInt(edad), // Convierte a numero
+      dirrecion: direccion, // Corrige el nombre del campo
+      peso: parseInt(peso), // Convertir a numero
+      familiar: nombreContacto, // nombre de contacto
+      numero: parseInt(numeroContacto), // Convierte a numero
       fechaexp: new Date().toLocaleDateString(), // Usar la fecha actual
       estado: 'en proceso', // Estado por defecto
-      codicion: 'En tratamiento', // Condición por defecto
+      codicion: 'En tratamiento', 
     })
     .then(() => {
       console.log('Paciente registrado correctamente!');
-      // Aquí podrías mostrar un mensaje de éxito o redireccionar a otra pantalla
+      // mensaje de exito
     })
     .catch((error) => {
       console.error('Error al registrar paciente: ', error);
-      // Aquí podrías mostrar un mensaje de error al usuario
+      // mensaje de error al usuario
     });
   };
 
@@ -58,16 +58,16 @@ const RegistroPacientes = () => {
         style={styles.input}
         value={edad}
         onChangeText={setEdad}
-        keyboardType="numeric" // Esto mostrará el teclado numérico
+        keyboardType="numeric" // muestra el teclado numerico
       />
       <Text style={{ marginBottom: 10, fontWeight: 'bold' }}>DUI:</Text>
       <TextInput
         style={styles.input}
         value={dui}
         onChangeText={setDui}
-        keyboardType="numeric" // Esto mostrará el teclado numérico
+        keyboardType="numeric" // muestra el teclado numerico
       />
-      <Text style={{ marginBottom: 10, fontWeight: 'bold' }}>Dirección:</Text>
+      <Text style={{ marginBottom: 10, fontWeight: 'bold' }}>Direccion:</Text>
       <TextInput
         style={styles.input}
         value={direccion}
@@ -78,7 +78,7 @@ const RegistroPacientes = () => {
         style={styles.input}
         value={peso}
         onChangeText={setPeso}
-        keyboardType="numeric" // Esto mostrará el teclado numérico
+        keyboardType="numeric" // muestra el teclado numerico
       />
       <Text style={{ marginBottom: 10, fontWeight: 'bold' }}>
         Nombre del contacto:
@@ -89,13 +89,13 @@ const RegistroPacientes = () => {
         onChangeText={setNombreContacto}
       />
       <Text style={{ marginBottom: 10, fontWeight: 'bold' }}>
-        Número del contacto:
+        Numero del contacto:
       </Text>
       <TextInput
         style={styles.input}
         value={numeroContacto}
         onChangeText={setNumeroContacto}
-        keyboardType="phone-pad" // Esto mostrará el teclado numérico con opción de marcación
+        keyboardType="phone-pad" // muestra el teclado numerico con una opcion de marcasion
       />
 
       <Pressable style={styles.button} onPress={guardarPaciente}>
@@ -105,7 +105,7 @@ const RegistroPacientes = () => {
   );
 };
 
-
+// estilos
 const styles = StyleSheet.create({
   container: {
     paddingTop: 20,

@@ -4,7 +4,7 @@ import firebase from "firebase/compat/app";
 import 'firebase/compat/auth'; 
 import 'firebase/compat/firestore'; 
 
-// Configuración de Firebase
+// Configuracion de Firebase
 var firebaseConfig = {
     apiKey: "AIzaSyBYQytt_OkWbm2AexhNcsdBXSUlHC9b6dg",
     authDomain: "dps-asilo-sv.firebaseapp.com",
@@ -15,13 +15,12 @@ var firebaseConfig = {
     measurementId: "G-QSVW3HW5BB"
 };
 
-// Inicialización de Firebase con la configuración proporcionada
+// Inicializacion de Firebase
 firebase.initializeApp(firebaseConfig);
 
-// Obtención de una referencia a Firestore
+// Obtencion de una referencia a Firestore
 const db = firebase.firestore();
 
-// Exportación de Firebase y la referencia a Firestore para su uso en otros archivos
 export default {
     firebase,
     db,
