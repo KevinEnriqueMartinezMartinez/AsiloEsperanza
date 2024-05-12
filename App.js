@@ -11,6 +11,8 @@ import GestionDoctores from './GestionDoctores.js';
 
 const Stack = createStackNavigator();
 
+
+
 const App = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
