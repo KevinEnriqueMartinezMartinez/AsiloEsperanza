@@ -30,6 +30,14 @@ const SidebarMenu = ({ onClose }) => {
    navigation.navigate('GestionDoctores')
  } 
 
+ const navigateToRegistroCitas= () =>{
+  navigation.navigate('RegistroCitas')
+} 
+
+const navigateToGestionCita= () =>{
+  navigation.navigate('GestionCita')
+} 
+
  const closedSideBar = () => {
    onClose();
  }
@@ -59,6 +67,12 @@ const SidebarMenu = ({ onClose }) => {
       </TouchableOpacity>
       <TouchableOpacity style={styles.menuItem} onPress={navigateToGestionDoctores}>
         <Text style={styles.menuText}>Gestión de doctores</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.menuItem} onPress={navigateToRegistroCitas}>
+        <Text style={styles.menuText}>Registro Citas</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.menuItem} onPress={navigateToGestionCita}>
+        <Text style={styles.menuText}>Gestion Citas</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.menuItem} onPress={navigateCerrarSession}>
         <Text style={styles.menuText}>Cerrar Sesion</Text>

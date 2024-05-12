@@ -2,16 +2,16 @@ import React, { useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native'; 
 import { createStackNavigator } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
-import RegistroPacientes from './RegistroPacientes';
-import GestionPacientes from './GestionPacientes';
-import HomeScreen from './HomeScreen';
-import Login from './Login';
-import RegistroDoctores from './RegistroDoctores.js';
-import GestionDoctores from './GestionDoctores.js';
+import RegistroPacientes from './screens/RegistroPacientes.js';
+import GestionPacientes from './screens/GestionPacientes.js';
+import HomeScreen from './screens/HomeScreen.js';
+import Login from './screens/Login';
+import RegistroDoctores from './screens/RegistroDoctores.js';
+import GestionDoctores from './screens/GestionDoctores.js';
+import RegistroCitas from './screens/RegistroCitas.js';
+import GestionCita from './screens/GestionCita.js';
 
 const Stack = createStackNavigator();
-
-
 
 const App = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -93,7 +93,43 @@ const App = () => {
             ),
           }}
         />
+
+
+
+        <Stack.Screen
+          name="RegistroCitas"
+          component={RegistroCitas}
+          options={{
+            title: 'Registro de citas',
+            headerStyle: {
+              backgroundColor: 'black',
+            },
+            headerTintColor: 'white',
+            headerBackTitleVisible: false,
+            headerBackImage: () => (
+              <Ionicons name="arrow-back" size={24} color="orange" />
+            ),
+          }}
+        />
+         <Stack.Screen
+          name="GestionCita"
+          component={GestionCita}
+          options={{
+            title: 'Gestion de citas',
+            headerStyle: {
+              backgroundColor: 'black',
+            },
+            headerTintColor: 'white',
+            headerBackTitleVisible: false,
+            headerBackImage: () => (
+              <Ionicons name="arrow-back" size={24} color="orange" />
+            ),
+          }}
+        />
+        
+        
       </Stack.Navigator>
+      
     </NavigationContainer>
 
   );

@@ -1,22 +1,40 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity } from 'react-native';
 
+import firebase from '../database/firebase'; // Inicializa la conexión
+
 export default function App() {
-  const [nombre, setNombre] = useState('');
+
+
   const [carnet, setCarnet] = useState('');
   const [especialidad, setEspecialidad] = useState('');
-  const [tel, setTel] = useState('');
-  const [jvpm, setJVPM] = useState('');
+  const [celular, setCelular] = useState('');
   const [correo, setCorreo] = useState('');
+  const [jvpm, setJvpm] = useState('');
+  const [nombre, setNombre] = useState('');
 
-  const handleRegistro = () => {
-    console.log('Nombre:', nombre);
-    console.log('Carnet:', carnet);
-    console.log('Especialidad:', especialidad);
-    console.log('Tel:', tel);
-    console.log('JVPM:', jvpm);
-    console.log('Correo:', correo);
+
+  const guardarMedico = () => {
+    firebase.db.collection('Doctor').add({
+      carnet: parseInt(carnet),
+      especialidad: especialidad,
+      celular: parseInt(celular),
+      correo: correo,
+      jvpm: jvpm,
+      nombre: nombre,
+    })
+    .then(() => {
+      console.log('Médico registrado correctamente!');
+      // Aquí podrías mostrar un mensaje de éxito o redireccionar a otra pantalla
+    })
+    .catch((error) => {
+      console.error('Error al registrar médico: ', error);
+      // Aquí podrías mostrar un mensaje de error al usuario
+    });
   };
+
+
+
 
   const inputStyle = {
     padding: 5,
@@ -77,8 +95,8 @@ export default function App() {
           <TextInput
             style={inputStyle}
             placeholder=""
-            value={tel}
-            onChangeText={setTel}
+            value={celular}
+            onChangeText={setCelular}
           />
         </View>
 
@@ -88,7 +106,7 @@ export default function App() {
             style={inputStyle}
             placeholder=""
             value={jvpm}
-            onChangeText={setJVPM}
+            onChangeText={setJvpm}
           />
         </View>
 
@@ -102,7 +120,7 @@ export default function App() {
           />
         </View>
 
-        <TouchableOpacity onPress={handleRegistro} style={buttonStyle}>
+        <TouchableOpacity onPress={guardarMedico} style={buttonStyle}>
           <Text style={buttonText}>Registrar</Text>
         </TouchableOpacity>
       </View>

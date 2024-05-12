@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
-import TopBar from './TopBar';
-import SidebarMenu from './SidebarMenu';
+import TopBar from '../TopBar';
+import SidebarMenu from '../SidebarMenu';
 
 const HomeScreen = ({ navigation }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
