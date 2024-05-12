@@ -35,10 +35,10 @@ export default function App() {
       );
       navigation.navigate('Home');
     } catch (error) {
-      console.error('Error al iniciar sesi�n: no datos', error);
+      console.error('Error al iniciar sesion: no datos', error);
     }
     }else{
-      console.error('Error al iniciar sesi�n: no datos');
+      console.error('Error al iniciar sesion: no datos');
     }
   };
 
