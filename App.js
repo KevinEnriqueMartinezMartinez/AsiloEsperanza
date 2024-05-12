@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native'; 
 import { createStackNavigator } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
-import RegistroPacientes from './RegistroPacientes';
-import GestionPacientes from './GestionPacientes';
-import HomeScreen from './HomeScreen';
-import Login from './Login';
-import RegistroDoctores from './RegistroDoctores.js';
-import GestionDoctores from './GestionDoctores.js';
-import RegistroCitas from './RegistroCitas.js';
-import GestionCita from './GestionCita.js';
+import RegistroPacientes from './screens/RegistroPacientes.js';
+import GestionPacientes from './screens/GestionPacientes.js';
+import HomeScreen from './screens/HomeScreen.js';
+import Login from './screens/Login';
+import RegistroDoctores from './screens/RegistroDoctores.js';
+import GestionDoctores from './screens/GestionDoctores.js';
+import RegistroCitas from './screens/RegistroCitas.js';
+import GestionCita from './screens/GestionCita.js';
 
 const Stack = createStackNavigator();
 

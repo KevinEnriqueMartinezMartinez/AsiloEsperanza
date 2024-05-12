@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity,Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
 import * as WebBrowser from 'expo-web-browser';
@@ -8,7 +8,7 @@ import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
 
 
-import firebase from '../database/firebase'; // Inicializa la conexión
+import firebase from '../database/firebase'; // Inicializa la conexiï¿½n
 import { AuthSession } from 'expo';
 
 export default function App() {
@@ -23,23 +23,32 @@ export default function App() {
     if (email !== '' || password !== '') {
     try {
       await firebase.firebase.auth().signInWithEmailAndPassword(email, password);
-      console.error('iniciar sesión: correcto');
+      
+      Alert.alert(
+        '',
+        'Bienvenido Asilo Nueva Esperanza',
+        [
+         // { text: 'Cancelar', onPress: () => console.log('Cancelar') },
+          { text: 'Aceptar', onPress: () => console.log('Aceptar') }
+        ],
+        { cancelable: false }
+      );
       navigation.navigate('Home');
     } catch (error) {
-      console.error('Error al iniciar sesión: no datos', error);
+      console.error('Error al iniciar sesiï¿½n: no datos', error);
     }
     }else{
-      console.error('Error al iniciar sesión: no datos');
+      console.error('Error al iniciar sesiï¿½n: no datos');
     }
   };
 
 
   const handleGoogleLogin = async () => {
     try {
-      // Configurar el cliente de autenticación con Google
+      // Configurar el cliente de autenticaciï¿½n con Google
       Google.setClientId('186549304054-fl8898qg611oc6ileqpkln8c60b67ifs.apps.googleusercontent.com');
   
-      // Abrir la ventana de inicio de sesión de Google
+      // Abrir la ventana de inicio de sesiï¿½n de Google
       const redirectUrl = await WebBrowser.openAuthSessionAsync(
         `https://accounts.google.com/o/oauth2/v2/auth?client_id=${Google.clientId}&redirect_uri=${encodeURIComponent(
           WebBrowser.maybeCompleteAuthSession().url
@@ -53,13 +62,13 @@ export default function App() {
         // Autenticar con Firebase usando el token de acceso
         const credential = firebase.firebase.auth.GoogleAuthProvider.credential(null, accessToken);
         await firebase.firebase.auth().signInWithCredential(credential);
-        console.error('Inicio de sesión con Google exitoso');
+        console.error('Inicio de sesiï¿½n con Google exitoso');
         navigation.navigate('Home');
       } else {
-        console.error('Inicio de sesión con Google cancelado');
+        console.error('Inicio de sesiï¿½n con Google cancelado');
       }
     } catch (error) {
-      console.error('Error al iniciar sesión con Google:', error);
+      console.error('Error al iniciar sesiï¿½n con Google:', error);
     }
   };
   
@@ -76,7 +85,7 @@ export default function App() {
         <Text style={styles.title}>Asilo Nueva Esperanza</Text>
         <TextInput
           style={styles.input}
-          placeholder="Correo electrónico"
+          placeholder="Correo electrï¿½nico"
           keyboardType="email-address"
           autoCapitalize="none"
           value={email}
@@ -84,17 +93,17 @@ export default function App() {
         />
         <TextInput
           style={styles.input}
-          placeholder="Contraseña"
+          placeholder="Contraseï¿½a"
           secureTextEntry
           autoCapitalize="none"
           value={password}
           onChangeText={setPassword}
         />
         <TouchableOpacity style={styles.button} onPress={handleLogin}>
-          <Text style={styles.buttonText}>Iniciar sesión</Text>
+          <Text style={styles.buttonText}>Iniciar sesiï¿½n</Text>
         </TouchableOpacity>
         <TouchableOpacity style={[styles.googleButton, { marginTop: 20 }]} onPress={handleGoogleLogin}>
-          <Text style={styles.buttonText}>Iniciar sesión con Google</Text>
+          <Text style={styles.buttonText}>Iniciar sesiï¿½n con Google</Text>
         </TouchableOpacity>
       </View>
       <StatusBar style="auto" />
