@@ -85,7 +85,7 @@ export default function App() {
         <Text style={styles.title}>Asilo Nueva Esperanza</Text>
         <TextInput
           style={styles.input}
-          placeholder="Correo electr�nico"
+          placeholder="Correo electronico"
           keyboardType="email-address"
           autoCapitalize="none"
           value={email}
@@ -93,17 +93,17 @@ export default function App() {
         />
         <TextInput
           style={styles.input}
-          placeholder="Contrase�a"
+          placeholder="Password"
           secureTextEntry
           autoCapitalize="none"
           value={password}
           onChangeText={setPassword}
         />
         <TouchableOpacity style={styles.button} onPress={handleLogin}>
-          <Text style={styles.buttonText}>Iniciar sesi�n</Text>
+          <Text style={styles.buttonText}>Iniciar sesion</Text>
         </TouchableOpacity>
         <TouchableOpacity style={[styles.googleButton, { marginTop: 20 }]} onPress={handleGoogleLogin}>
-          <Text style={styles.buttonText}>Iniciar sesi�n con Google</Text>
+          <Text style={styles.buttonText}>Iniciar sesion con Google</Text>
         </TouchableOpacity>
       </View>
       <StatusBar style="auto" />
