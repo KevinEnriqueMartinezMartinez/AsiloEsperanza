@@ -4,8 +4,8 @@ import { View, Text, TextInput, Button, StyleSheet, Pressable } from 'react-nati
 const GestionPacientes = () => {
  //array y llena los datos de la tabla
   const pacientes = [
-    { nombre: 'Juan', edad: 30, dui: '02568794-3', direccion: 'Dirección 1', peso: 70, contacto: 'Contacto 1', telContacto: '1111111' },
-    { nombre: 'María', edad: 25, dui: '89748562-8', direccion: 'Dirección 2', peso: 65, contacto: 'Contacto 2', telContacto: '2222222' },
+    { nombre: 'Juan', edad: 73, dui: '02568794-3', direccion: 'Dirección 1', peso: 70, contacto: 'Contacto 1', telContacto: '1111111' },
+    { nombre: 'María', edad: 70, dui: '89748562-8', direccion: 'Dirección 2', peso: 65, contacto: 'Contacto 2', telContacto: '2222222' },
   ];
 // nos retorna a la vista
   return (
