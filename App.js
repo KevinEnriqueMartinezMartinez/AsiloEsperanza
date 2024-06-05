@@ -10,7 +10,8 @@ import RegistroDoctores from './screens/RegistroDoctores.js';
 import GestionDoctores from './screens/GestionDoctores.js';
 import RegistroCitas from './screens/RegistroCitas.js';
 import GestionCita from './screens/GestionCita.js';
-
+import HistorialCita from './screens/HistorialCita.js';
+import DetalleCita from './screens/DetalleCita.js';
 const Stack = createStackNavigator();
 
 const App = () => {
@@ -116,6 +117,36 @@ const App = () => {
           component={GestionCita}
           options={{
             title: 'Gestion de citas',
+            headerStyle: {
+              backgroundColor: 'black',
+            },
+            headerTintColor: 'white',
+            headerBackTitleVisible: false,
+            headerBackImage: () => (
+              <Ionicons name="arrow-back" size={24} color="orange" />
+            ),
+          }}
+        />
+         <Stack.Screen
+          name="HistorialCita"
+          component={HistorialCita}
+          options={{
+            title: 'Historial de Citas',
+            headerStyle: {
+              backgroundColor: 'black',
+            },
+            headerTintColor: 'white',
+            headerBackTitleVisible: false,
+            headerBackImage: () => (
+              <Ionicons name="arrow-back" size={24} color="orange" />
+            ),
+          }}
+        />
+         <Stack.Screen
+          name="DetalleCita"
+          component={DetalleCita}
+          options={{
+            title: 'Detalle de Citas',
             headerStyle: {
               backgroundColor: 'black',
             },

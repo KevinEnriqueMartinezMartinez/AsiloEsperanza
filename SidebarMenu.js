@@ -38,6 +38,13 @@ const navigateToGestionCita= () =>{
   navigation.navigate('GestionCita')
 } 
 
+const navigateToHistorialCita= () =>{
+  navigation.navigate('HistorialCita')
+}
+const navigateToDetalleCita= () =>{
+  navigation.navigate('DetalleCita')
+}
+
  const closedSideBar = () => {
    onClose();
  }
@@ -74,9 +81,16 @@ const navigateToGestionCita= () =>{
       <TouchableOpacity style={styles.menuItem} onPress={navigateToGestionCita}>
         <Text style={styles.menuText}>Gestion Citas</Text>
       </TouchableOpacity>
+      <TouchableOpacity style={styles.menuItem} onPress={navigateToHistorialCita}>
+        <Text style={styles.menuText}>Historial Cita</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.menuItem} onPress={navigateToDetalleCita}>
+        <Text style={styles.menuText}>Detalle Cita</Text>
+      </TouchableOpacity>
       <TouchableOpacity style={styles.menuItem} onPress={navigateCerrarSession}>
         <Text style={styles.menuText}>Cerrar Sesion</Text>
       </TouchableOpacity>
+      
     </View>
   );
 }
