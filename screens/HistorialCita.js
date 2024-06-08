@@ -1,106 +1,230 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity,} from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, TouchableOpacity, Modal, FlatList, TouchableHighlight, Alert, ScrollView, StyleSheet } from 'react-native';
+import firebase from '../database/firebase';
 
+export default function HistorialPaciente() {
+  const [modalVisible, setModalVisible] = useState(false);
+  const [pacientes, setPacientes] = useState([]);
+  const [filteredPacientes, setFilteredPacientes] = useState([]);
+  const [selectedPaciente, setSelectedPaciente] = useState(null);
+  const [idPaciente, setIdPaciente] = useState('');
+  const [citas, setCitas] = useState([]);
 
-//import firebase from '../database/firebase'; // Inicializa la conexi贸n
+  useEffect(() => {
+    const fetchPacientes = async () => {
+      try {
+        const pacientesSnapshot = await firebase.db.collection('Paciente').get();
+        const pacientesData = pacientesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setPacientes(pacientesData);
+        setFilteredPacientes(pacientesData);
+      } catch (error) {
+        console.error("Error fetching patients: ", error);
+      }
+    };
+    fetchPacientes();
+  }, []);
 
-export default function App() {
-
-  const [nombrePaciente, setNombrePaciente] = useState('');
-  const [fechaCita, setFechaCita] = useState('');
-  const [categoria, setCategoria] = useState('');
-  const [detalle, setDetalle] = useState('');
-
-  const guardarMedico = () => {
-    // Aqu铆 deber铆as a帽adir la l贸gica para guardar en Firebase
+  const handlePacienteSearch = (text) => {
+    const filtered = pacientes.filter(paciente => 
+      paciente.nombre.toLowerCase().includes(text.toLowerCase())
+    );
+    setFilteredPacientes(filtered);
   };
 
-  // Funci贸n para formatear la fecha
-  const formatDate = (date) => {
-    const d = new Date(date);
-    const day = d.getDate().toString().padStart(2, '0');
-    const month = (d.getMonth() + 1).toString().padStart(2, '0'); // Sumamos 1 porque los meses en JavaScript empiezan en 0
-    const year = d.getFullYear();
-    return `${day}/${month}/${year}`;
+  const handlePacienteSelect = (paciente) => {
+    setSelectedPaciente(paciente);
+    setIdPaciente(paciente.id);
+    setModalVisible(false);
   };
 
-  // estilos
-  const inputStyle = {
-    padding: 5,
-    borderWidth: 1,
-    borderColor: 'orange',
-    borderRadius: 10,
-    marginBottom: 15,
+  const renderPaciente = ({ item }) => (
+    <TouchableHighlight
+      underlayColor="#ddd"
+      onPress={() => handlePacienteSelect(item)}
+    >
+      <View style={styles.pacienteItem}>
+        <Text>Nombre: {item.nombre}</Text>
+        <Text>Edad: {item.edad}</Text>
+        <Text>Direccion: {item.direccion}</Text>
+        <Text>Peso: {item.peso}</Text>
+        <Text>Familiar: {item.familiar}</Text>
+        <Text>N鷐ero de Contacto: {item.numero}</Text>
+      </View>
+    </TouchableHighlight>
+  );
+
+  const buscarCitaPaciente = async () => {
+    if (!idPaciente) {
+      Alert.alert('Error', 'Por favor selecciona un paciente primero');
+      return;
+    }
+
+    try {
+      const citasSnapshot = await firebase.db.collection('Cita').where('idPaciente', '==', idPaciente).get();
+      const citasData = citasSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      
+      console.log('Citas obtenidas:', citasData);
+
+      setCitas(citasData);
+
+      if (citasData.length === 0) {
+        Alert.alert('Informacion', 'El paciente no tiene citas registradas');
+      }
+    } catch (error) {
+      console.error("Error fetching appointments: ", error);
+      Alert.alert('Error', 'No se pudieron obtener las citas del paciente');
+    }
+  };
+
+  const renderCita = ({ item }) => (
+    <View style={styles.citaItem}>
+      <Text>Doctor: {item.Doctor}</Text>
+      <Text>Estado: {item.Estado}</Text>
+      <Text>Fecha: {item.Fecha}</Text>
+      <Text>Hora: {item.Hora}</Text>
+      <Text>Paciente: {item.Paciente}</Text>
+    </View>
+  );
+
+  return (
+    <ScrollView contentContainerStyle={styles.container}>
+      <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.searchButton}>
+        <Text style={styles.buttonText}>Buscar Paciente</Text>
+      </TouchableOpacity>
+      
+      <Modal
+        visible={modalVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalView}>
+          <TextInput
+            style={styles.modalSearch}
+            placeholder="Buscar Paciente"
+            onChangeText={handlePacienteSearch}
+          />
+          <FlatList
+            data={filteredPacientes}
+            keyExtractor={(item) => item.id}
+            renderItem={renderPaciente}
+          />
+          <TouchableOpacity onPress={() => setModalVisible(false)}>
+            <Text style={styles.closeModal}>Cerrar</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+
+      {selectedPaciente && (
+        <View style={styles.pacienteDetails}>
+          <Text style={styles.label}>Nombre:</Text>
+          <Text>{selectedPaciente.nombre}</Text>
+          <Text style={styles.label}>Edad:</Text>
+          <Text>{selectedPaciente.edad}</Text>
+          <Text style={styles.label}>Direccion:</Text>
+          <Text>{selectedPaciente.direccion}</Text>
+          <Text style={styles.label}>Peso:</Text>
+          <Text>{selectedPaciente.peso}</Text>
+          <Text style={styles.label}>Familiar:</Text>
+          <Text>{selectedPaciente.familiar}</Text>
+          <Text style={styles.label}>N鷐ero de Contacto:</Text>
+          <Text>{selectedPaciente.numero}</Text>
+          <TouchableOpacity onPress={buscarCitaPaciente} style={styles.buttonStyle}>
+            <Text style={styles.buttonText}>Ver Citas</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {citas.length > 0 && (
+        <View style={styles.citasContainer}>
+          <Text style={styles.citasTitle}>Citas del Paciente</Text>
+          <FlatList
+            data={citas}
+            keyExtractor={(item) => item.id}
+            renderItem={renderCita}
+          />
+        </View>
+      )}
+    </ScrollView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flexGrow: 1,
     backgroundColor: 'white',
-  };
-
-  const buttonStyle = {
+    padding: 20,
+  },
+  searchButton: {
     backgroundColor: 'orange',
     padding: 12,
     borderRadius: 10,
     alignItems: 'center',
-  };
-
-  const buttonText = {
-    color: 'black',
+    marginBottom: 20,
+  },
+  buttonText: {
+    color: 'white',
     fontWeight: 'bold',
-  };
-
-  // retorna a la vista
-  return (
-    <View style={{ flex: 1, backgroundColor: 'white', justifyContent: 'center', padding: 20 }}>
-      {/* Campo para el nombre del paciente fuera del contenedor gris */}
-      <View style={{ marginBottom: 10 }}>
-        <Text style={{ marginBottom: 10, fontWeight: 'bold' }}>Nombre del paciente:</Text>
-        <TextInput
-          style={inputStyle}
-          placeholder=""
-          value={nombrePaciente}
-          onChangeText={setNombrePaciente}
-        />
-      </View>
-      
-      <View style={{ backgroundColor: 'lightgray', borderRadius: 15, padding: 20 }}>
-        {/* Campos para el detalle de la cita */}
-        <View style={{ marginBottom: 10 }}>
-          <Text style={{ marginBottom: 10, fontWeight: 'bold' }}>Fecha de cita:</Text>
-          <TextInput
-            style={inputStyle}
-            placeholder="DD/MM/AAAA"
-            value={fechaCita}
-            onChangeText={(text) => setFechaCita(text)}
-          />
-        </View>
-
-        <View style={{ marginBottom: 10 }}>
-  <Text style={{ marginBottom: 10, fontWeight: 'bold' }}>Categor铆a:</Text>
-  <Picker
-    selectedValue={categoria}
-    style={inputStyle}
-    onValueChange={(itemValue, itemIndex) => setCategoria(itemValue)}
-  >
-    <Picker.Item label="Enfermedades Cardiovasculares" value="Enfermedades Cardiovasculares" />
-    <Picker.Item label="Trastornos Neurol贸gicos" value="Trastornos Neurol贸gicos" />
-    <Picker.Item label="Problemas Respiratorios" value="Problemas Respiratorios" />
-  </Picker>
-</View>
-
-
-        <View style={{ marginBottom: 10 }}>
-          <Text style={{ marginBottom: 10, fontWeight: 'bold' }}>Detalle:</Text>
-          <TextInput
-            style={inputStyle}
-            placeholder=""
-            value={detalle}
-            onChangeText={setDetalle}
-          />
-        </View>
-
-        <TouchableOpacity onPress={guardarMedico} style={buttonStyle}>
-          <Text style={buttonText}>Detalles</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
-}
+  },
+  modalView: {
+    flex: 1,
+    backgroundColor: '#fff',
+    padding: 20,
+    marginTop: 50,
+    marginHorizontal: 20,
+    borderRadius: 10,
+  },
+  modalSearch: {
+    height: 40,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    marginBottom: 10,
+    backgroundColor: '#fff',
+  },
+  pacienteItem: {
+    padding: 10,
+    borderBottomColor: '#ccc',
+    borderBottomWidth: 1,
+  },
+  closeModal: {
+    textAlign: 'center',
+    color: '#007BFF',
+    marginTop: 20,
+    fontSize: 16,
+  },
+  label: {
+    fontWeight: 'bold',
+    marginBottom: 5,
+  },
+  pacienteDetails: {
+    marginTop: 20,
+    backgroundColor: 'lightgray',
+    padding: 20,
+    borderRadius: 10,
+  },
+  buttonStyle: {
+    backgroundColor: 'orange',
+    padding: 12,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  citasContainer: {
+    marginTop: 20,
+    padding: 20,
+    backgroundColor: 'lightgray',
+    borderRadius: 10,
+  },
+  citasTitle: {
+    fontWeight: 'bold',
+    fontSize: 18,
+    marginBottom: 10,
+  },
+  citaItem: {
+    padding: 10,
+    borderBottomColor: '#ccc',
+    borderBottomWidth: 1,
+  },
+});

@@ -1,96 +1,246 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, Button, StyleSheet, FlatList, Modal, TouchableOpacity, Alert } from 'react-native';
+import firebase from '../database/firebase';
 
-export default function App() {
-  const [especialidad, setEspecialidad] = useState('');
-  const [estado, setEstado] = useState('');
-// manda a llamar los datos de las constantes.
-  const handleFiltrar = () => {
-    console.log('Especialidad:', especialidad);
-    console.log('Estado:', estado);
+const GestionDoctores = () => {
+  const [doctores, setDoctores] = useState([]);
+  const [search, setSearch] = useState('');
+  const [doctoresOriginal, setDoctoresOriginal] = useState([]);
+  const [editingDoctor, setEditingDoctor] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+
+  useEffect(() => {
+    fetchDoctores();
+  }, []);
+
+  const fetchDoctores = async () => {
+    const snapshot = await firebase.db.collection('Doctor').get();
+    const doctoresList = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    setDoctores(doctoresList);
+    setDoctoresOriginal(doctoresList);
   };
 
-  const inputStyle = {
-    padding: 5,
-    borderWidth: 1,
-    borderColor: 'orange',
-    borderRadius: 10,
-    marginBottom: 15,
-    backgroundColor: 'white',
+  const handleSearch = () => {
+    const filteredDoctores = doctoresOriginal.filter(doctor => 
+      doctor.nombre.toLowerCase().includes(search.toLowerCase()) ||
+      (doctor.jvpm && doctor.jvpm.includes(search))
+    );
+    setDoctores(filteredDoctores);
   };
 
-  const buttonStyle = {
-    backgroundColor: 'orange',
-    padding: 12,
-    borderRadius: 10,
-    alignItems: 'center',
+  const handleEdit = (id) => {
+    const doctorToEdit = doctores.find(doctor => doctor.id === id);
+    setEditingDoctor(doctorToEdit);
+    setModalVisible(true);
   };
 
-  const buttonText = {
-    color: 'black',
-    fontWeight: 'bold',
+  const handleSaveEdit = async () => {
+    try {
+      // Verificar si el doctor editado tiene el mismo ID que otro doctor en la base de datos
+      const existingDoctorSnapshot = await firebase.db.collection('Doctor').doc(editingDoctor.id).get();
+      if (!existingDoctorSnapshot.exists) {
+        // No existe ning˙n doctor con el ID del doctor editado, proceder con la validacion del JVPM y n˙mero de carnet
+        // Verificar si el JVPM ya existe en la base de datos
+        const jvpmSnapshot = await firebase.db.collection('Doctor').where('jvpm', '==', editingDoctor.jvpm).get();
+        if (!jvpmSnapshot.empty) {
+          // El JVPM ya existe, mostrar mensaje de error
+          Alert.alert(
+            'Error',
+            'Ya existe un doctor con este n˙mero de registro profesional (JVPM)',
+            [{ text: 'Aceptar', onPress: () => console.log('Aceptar') }],
+            { cancelable: false }
+          );
+          return;
+        }
+  
+        // Verificar si el n˙mero de carnet ya existe en la base de datos
+        const carnetSnapshot = await firebase.db.collection('Doctor').where('carnet', '==', editingDoctor.carnet).get();
+        if (!carnetSnapshot.empty) {
+          // El n˙mero de carnet ya existe, mostrar mensaje de error
+          Alert.alert(
+            'Error',
+            'Ya existe un doctor con este n˙mero de carnet',
+            [{ text: 'Aceptar', onPress: () => console.log('Aceptar') }],
+            { cancelable: false }
+          );
+          return;
+        }
+      }
+  
+      // El JVPM y el n˙mero de carnet son ˙nicos o el doctor editado es el mismo que se est· editando, proceder con la actualizacion del doctor
+      await firebase.db.collection('Doctor').doc(editingDoctor.id).update({
+        nombre: editingDoctor.nombre,
+        jvpm: editingDoctor.jvpm,
+        especialidad: editingDoctor.especialidad,
+        carnet: editingDoctor.carnet,
+        celular: editingDoctor.celular,
+        correo: editingDoctor.correo,
+      });
+      
+      // Actualizar la lista de doctores despues de guardar los cambios
+      const updatedDoctores = doctores.map(doctor => {
+        if (doctor.id === editingDoctor.id) {
+          return editingDoctor;
+        }
+        return doctor;
+      });
+      setDoctores(updatedDoctores);
+      setModalVisible(false);
+    } catch (error) {
+      console.error("Error al guardar los cambios:", error);
+    }
+  };
+  
+  
+  
+
+  const handleDelete = async (id) => {
+    try {
+      await firebase.db.collection('Doctor').doc(id).delete();
+      const updatedDoctores = doctores.filter(doctor => doctor.id !== id);
+      setDoctores(updatedDoctores);
+    } catch (error) {
+      console.error("Error al eliminar el doctor:", error);
+    }
   };
 
-  const tableContainerStyle = {
-    backgroundColor: 'lightgray',
-    borderRadius: 15,
-    padding: 20,
-    marginTop: 20,
-  };
-
-  // Datos est√°ticos para la tabla
-  const datoEstatico = {
-    nombreDoctor: 'Dr. Gerardo',
-    apellido: 'Marroquin',
-    JVPM: '12345',
+  const handleCancelEdit = () => {
+    setModalVisible(false);
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: 'white', justifyContent: 'center', padding: 20 }}>
-      <View style={{ backgroundColor: 'lightgray', borderRadius: 15, padding: 20 }}>
-        <View style={{ marginBottom: 10 }}>
-          <Text style={{ marginBottom: 10, fontWeight: 'bold' }}>Especialidad:</Text>
-          <TextInput
-            style={inputStyle}
-            placeholder=""
-            value={especialidad}
-            onChangeText={setEspecialidad}
-          />
-        </View>
+    <View style={styles.container}>
+      <TextInput
+        style={styles.input}
+        placeholder="Buscar por nombre o JVPM"
+        value={search}
+        onChangeText={setSearch}
+      />
+      <Button title="Buscar" onPress={handleSearch} />
 
-        <View style={{ marginBottom: 10 }}>
-          <Text style={{ marginBottom: 10, fontWeight: 'bold' }}>Estado:</Text>
-          <TextInput
-            style={inputStyle}
-            placeholder=""
-            value={estado}
-            onChangeText={setEstado}
-          />
-        </View>
+      <FlatList
+        data={doctores}
+        keyExtractor={item => item.id}
+        renderItem={({ item }) => (
+          <View style={styles.doctorItem}>
+            <Text>Nombre: {item.nombre}</Text>
+            <Text>JVPM: {item.jvpm}</Text>
+            <Text>Especialidad: {item.especialidad}</Text>
+            <Text>Carnet: {item.carnet}</Text>
+            <Text>Celular: {item.celular}</Text>
+            <Text>Correo: {item.correo}</Text>
+            <TouchableOpacity style={styles.button} onPress={() => handleEdit(item.id)}>
+              <Text style={styles.buttonText}>Editar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.button, {backgroundColor: 'red'}]} onPress={() => handleDelete(item.id)}>
+              <Text style={styles.buttonText}>Eliminar</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      />
 
-        <TouchableOpacity onPress={handleFiltrar} style={buttonStyle}>
-          <Text style={buttonText}>Filtrar</Text>
-        </TouchableOpacity>
-      </View>
+<Modal
+  visible={modalVisible}
+  animationType="slide"
+  transparent={true}
+  onRequestClose={handleCancelEdit}
+>
+  <View style={styles.modalContainer}>
+    <View style={styles.modalContent}>
+      <Text>Editar Doctor</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Nombre"
+        value={editingDoctor ? editingDoctor.nombre : ''}
+        onChangeText={(text) => setEditingDoctor(prevState => ({ ...prevState, nombre: text }))}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="JVPM"
+        value={editingDoctor ? editingDoctor.jvpm : ''}
+        onChangeText={(text) => setEditingDoctor(prevState => ({ ...prevState, jvpm: text }))}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Especialidad"
+        value={editingDoctor ? editingDoctor.especialidad : ''}
+        onChangeText={(text) => setEditingDoctor(prevState => ({ ...prevState, especialidad: text }))}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Carnet"
+        keyboardType="numeric"
+        value={editingDoctor ? editingDoctor.carnet.toString() : ''}
+        onChangeText={(text) => setEditingDoctor(prevState => ({ ...prevState, carnet: parseInt(text) || 0 }))}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Celular"
+        keyboardType="numeric"
+        value={editingDoctor ? editingDoctor.celular.toString() : ''}
+        onChangeText={(text) => setEditingDoctor(prevState => ({ ...prevState, celular: parseInt(text) || 0 }))}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Correo"
+        value={editingDoctor ? editingDoctor.correo : ''}
+        onChangeText={(text) => setEditingDoctor(prevState => ({ ...prevState, correo: text }))}
+      />
+      <Button title="Guardar" onPress={handleSaveEdit} />
+      <Button title="Cancelar" onPress={handleCancelEdit} />
+    </View>
+  </View>
+</Modal>
 
-      {/* Texto "Lista de Doctores" fuera del formulario y la tabla */}
-      <Text style={{ fontWeight: 'bold', fontSize: 18, textAlign: 'left', marginTop: 20, marginLeft: 20 }}>Lista de Doctores:</Text>
-
-      {/* Tabla */}
-      <View style={tableContainerStyle}>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 }}>
-          <Text style={{ fontWeight: 'bold' }}>Nombre del Doctor</Text>
-          <Text style={{ fontWeight: 'bold' }}>Apellido</Text>
-          <Text style={{ fontWeight: 'bold' }}>JVPM</Text>
-        </View>
-
-        {/* datos est√°ticos */}
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 5 }}>
-          <Text>{datoEstatico.nombreDoctor}</Text>
-          <Text>{datoEstatico.apellido}</Text>
-          <Text>{datoEstatico.JVPM}</Text>
-        </View>
-      </View>
     </View>
   );
-}
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: 'white',
+    padding: 20,
+  },
+  input: {
+    height: 40,
+    borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 5,
+    marginBottom: 10,
+    paddingHorizontal: 10,
+  },
+  doctorItem: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: 'gray',
+  },
+  button: {
+    backgroundColor: 'orange',
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 5,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    elevation: 5,
+  },
+});
+
+export default GestionDoctores;

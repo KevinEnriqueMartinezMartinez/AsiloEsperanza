@@ -1,116 +1,89 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, TouchableOpacity, FlatList, Alert } from 'react-native';
+import firebase from '../database/firebase';
 
 export default function App() {
-  const [fechaCita, setFechaCita] = useState('');
-  const [nombrePaciente, setNombrePaciente] = useState('');
-  const [nombreDoctor, setNombreDoctor] = useState('');
-  const [edad, setEdad] = useState('');
-  const [categoriaCita, setCategoriaCita] = useState('');
-  const [observacion, setObservacion] = useState('');
+  const [citas, setCitas] = useState([]);
+  const [selectedCita, setSelectedCita] = useState(null);
 
-// trae los datos de las constantes de arriba.
-  const handleRegistro = () => {
-    console.log('Fecha de Cita:', fechaCita);
-    console.log('Nombre del paciente:', nombrePaciente);
-    console.log('Nombre del Doctor:', nombreDoctor);
-    console.log('Edad:', edad);
-    console.log('Categoria de Cita:', categoriaCita);
-    console.log('Observacion:', observacion);
+  useEffect(() => {
+    const fetchCitas = async () => {
+      const citasSnapshot = await firebase.db.collection('Cita').get();
+      const citasData = citasSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setCitas(citasData);
+    };
+    fetchCitas();
+  }, []);
+
+  const handleStatusChange = (citaId, newStatus) => {
+    firebase.db.collection('Cita').doc(citaId).update({ Estado: newStatus })
+      .then(() => {
+        setCitas(citas.map(cita => cita.id === citaId ? { ...cita, Estado: newStatus } : cita));
+        Alert.alert('exito', 'El estado de la cita ha sido actualizado.');
+      })
+      .catch(error => {
+        Alert.alert('Error', `Error al actualizar el estado: ${error.message}`);
+      });
   };
 
-  const inputStyle = {
-    padding: 5,
-    borderWidth: 1,
-    borderColor: 'orange',
-    borderRadius: 10,
-    marginBottom: 15,
-    backgroundColor: 'white',
+  const handleDeleteCita = (citaId) => {
+    firebase.db.collection('Cita').doc(citaId).delete()
+      .then(() => {
+        setCitas(citas.filter(cita => cita.id !== citaId));
+        Alert.alert('exito', 'La cita ha sido eliminada.');
+      })
+      .catch(error => {
+        Alert.alert('Error', `Error al eliminar la cita: ${error.message}`);
+      });
   };
 
-  const buttonStyle = {
-    backgroundColor: 'orange',
-    padding: 12,
-    borderRadius: 10,
-    alignItems: 'center',
-  };
-
-  const buttonText = {
-    color: 'black',
-    fontWeight: 'bold',
-  };
-//retorna a la vista
-  return (
-    <View style={{ flex: 1, backgroundColor: 'white', justifyContent: 'center', padding: 20 }}>
-      <View style={{ backgroundColor: 'lightgray', borderRadius: 15, padding: 20 }}>
-        {}
-        <View style={{ marginBottom: 10 }}>
-          <Text style={{ marginBottom: 10, fontWeight: 'bold' }}>Fecha de Cita:</Text>
-          <TextInput
-            style={inputStyle}
-            placeholder="DD/MM/AAAA"
-            value={fechaCita}
-            onChangeText={setFechaCita}
-          />
-        </View>
-
-        {}
-        <View style={{ marginBottom: 10 }}>
-          <Text style={{ marginBottom: 10, fontWeight: 'bold' }}>Nombre del paciente:</Text>
-          <TextInput
-            style={inputStyle}
-            placeholder=""
-            value={nombrePaciente}
-            onChangeText={setNombrePaciente}
-          />
-        </View>
-
-        <View style={{ marginBottom: 10 }}>
-          <Text style={{ marginBottom: 10, fontWeight: 'bold' }}>Nombre del Doctor:</Text>
-          <TextInput
-            style={inputStyle}
-            placeholder=""
-            value={nombreDoctor}
-            onChangeText={setNombreDoctor}
-          />
-        </View>
-
-        <View style={{ marginBottom: 10 }}>
-          <Text style={{ marginBottom: 10, fontWeight: 'bold' }}>Edad:</Text>
-          <TextInput
-            style={inputStyle}
-            placeholder=""
-            value={edad}
-            onChangeText={setEdad}
-          />
-        </View>
-
-        <View style={{ marginBottom: 10 }}>
-          <Text style={{ marginBottom: 10, fontWeight: 'bold' }}>Categoria de Cita:</Text>
-          <TextInput
-            style={inputStyle}
-            placeholder=""
-            value={categoriaCita}
-            onChangeText={setCategoriaCita}
-          />
-        </View>
-
-        <View style={{ marginBottom: 10 }}>
-          <Text style={{ marginBottom: 10, fontWeight: 'bold' }}>Observacion:</Text>
-          <TextInput
-            style={{ ...inputStyle, height: 100 }} 
-            placeholder=""
-            value={observacion}
-            onChangeText={setObservacion}
-            multiline={true}
-            numberOfLines={6}
-          />
-        </View>
-
-        <TouchableOpacity onPress={handleRegistro} style={buttonStyle}>
-          <Text style={buttonText}>Guardar</Text>
+  const renderCita = ({ item }) => (
+    <View style={styles.citaItem}>
+      <Text>Fecha: {item.Fecha}</Text>
+      <Text>Paciente: {item.Paciente}</Text>
+      <Text>Doctor: {item.Doctor}</Text>
+      <Text>Estado: {item.Estado}</Text>
+      <View style={styles.buttonsContainer}>
+        <TouchableOpacity style={styles.button} onPress={() => handleStatusChange(item.id, 'Atendido')}>
+          <Text style={styles.buttonText}>Marcar como Atendido</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={() => handleDeleteCita(item.id)}>
+          <Text style={styles.buttonText}>Eliminar Cita</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
+
+  return (
+    <View style={{ flex: 1, backgroundColor: 'white', padding: 20 }}>
+      <FlatList
+        data={citas}
+        keyExtractor={(item) => item.id}
+        renderItem={renderCita}
+      />
+    </View>
+  );
 }
+
+const styles = {
+  citaItem: {
+    padding: 20,
+    backgroundColor: 'lightgray',
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  buttonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 10,
+  },
+  button: {
+    backgroundColor: 'orange',
+    padding: 10,
+    borderRadius: 5,
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+};

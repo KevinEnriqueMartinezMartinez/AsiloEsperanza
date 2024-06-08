@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 
 import firebase from '../database/firebase'; // Inicializa la conexion
 
 export default function App() {
 
+  const navigation = useNavigation();
 
   const [carnet, setCarnet] = useState('');
   const [especialidad, setEspecialidad] = useState('');
@@ -13,8 +15,20 @@ export default function App() {
   const [jvpm, setJvpm] = useState('');
   const [nombre, setNombre] = useState('');
 
-
   const guardarMedico = () => {
+    // Validacion de campos obligatorios
+    if (!nombre || !carnet || !especialidad) {
+      Alert.alert('Error', 'Por favor, complete todos los campos obligatorios.');
+      return;
+    }
+
+    // Validacion de campos numericos
+    if (isNaN(parseInt(carnet)) || isNaN(parseInt(celular))) {
+      Alert.alert('Error', 'El carnet y el telefono celular deben ser números válidos.');
+      return;
+    }
+
+    // Envio de datos a Firebase
     firebase.db.collection('Doctor').add({
       carnet: parseInt(carnet),
       especialidad: especialidad,
@@ -25,24 +39,31 @@ export default function App() {
     })
     .then(() => {
       console.log('Medico registrado correctamente!');
-      
+      // Limpiar campos despues del registro exitoso
+      setCarnet('');
+      setEspecialidad('');
+      setCelular('');
+      setCorreo('');
+      setJvpm('');
+      setNombre('');
+      Alert.alert('exito', 'Medico registrado correctamente!');
+      navigation.navigate('Home');
     })
     .catch((error) => {
       console.error('Error al registrar medico: ', error);
-      
+      // Manejo de errores de Firebase
+      Alert.alert('Error', 'Error al registrar medico. Por favor, intentelo de nuevo más tarde.');
     });
   };
 
-
-
-// estilos
+  // estilos
   const inputStyle = {
     padding: 5,
     borderWidth: 1,
     borderColor: 'orange',
     borderRadius: 10,
     marginBottom: 15,
-      backgroundColor: 'white',
+    backgroundColor: 'white',
   };
 
   const buttonStyle = {
@@ -56,7 +77,8 @@ export default function App() {
     color: 'black',
     fontWeight: 'bold',
   };
-// retorna a la vista
+
+  // Retorna a la vista
   return (
     <View style={{ flex: 1, backgroundColor: 'white', justifyContent: 'center', padding: 20 }}>
       <View style={{ backgroundColor: 'lightgray', borderRadius: 15, padding: 20 }}>
@@ -71,7 +93,7 @@ export default function App() {
         </View>
 
         <View style={{ marginBottom: 10 }}>
-          <Text style={{ marginBottom: 10,fontWeight: 'bold' }}>Carnet del doctor:</Text>
+          <Text style={{ marginBottom: 10, fontWeight: 'bold' }}>Carnet del doctor:</Text>
           <TextInput
             style={inputStyle}
             placeholder=""
@@ -81,7 +103,7 @@ export default function App() {
         </View>
 
         <View style={{ marginBottom: 10 }}>
-          <Text style={{ marginBottom: 10,fontWeight: 'bold' }}>Especialidad:</Text>
+          <Text style={{ marginBottom: 10, fontWeight: 'bold' }}>Especialidad:</Text>
           <TextInput
             style={inputStyle}
             placeholder=""
@@ -91,7 +113,7 @@ export default function App() {
         </View>
 
         <View style={{ marginBottom: 10 }}>
-          <Text style={{ marginBottom: 10,fontWeight: 'bold' }}>Tel:</Text>
+          <Text style={{ marginBottom: 10, fontWeight: 'bold' }}>Tel:</Text>
           <TextInput
             style={inputStyle}
             placeholder=""
@@ -100,8 +122,8 @@ export default function App() {
           />
         </View>
 
-        <View style={{ marginBottom: 10,fontWeight: 'bold' }}>
-          <Text style={{ marginBottom: 10,fontWeight: 'bold' }}>JVPM:</Text>
+        <View style={{ marginBottom: 10 }}>
+          <Text style={{ marginBottom: 10, fontWeight: 'bold' }}>JVPM:</Text>
           <TextInput
             style={inputStyle}
             placeholder=""
@@ -111,7 +133,7 @@ export default function App() {
         </View>
 
         <View style={{ marginBottom: 10 }}>
-          <Text style={{ marginBottom: 10,fontWeight: 'bold'}}>Correo:</Text>
+          <Text style={{ marginBottom: 10, fontWeight: 'bold' }}>Correo:</Text>
           <TextInput
             style={inputStyle}
             placeholder=""
@@ -127,4 +149,3 @@ export default function App() {
     </View>
   );
 }
-

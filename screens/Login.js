@@ -35,6 +35,17 @@ export default function App() {
       );
       navigation.navigate('Home');
     } catch (error) {
+
+      Alert.alert(
+        '',
+        'Error al iniciar sesion: no datos',
+        [
+         
+          { text: 'Aceptar', onPress: () => console.log('Aceptar') }
+        ],
+        { cancelable: false }
+      );
+
       console.error('Error al iniciar sesion: no datos', error);
     }
     }else{

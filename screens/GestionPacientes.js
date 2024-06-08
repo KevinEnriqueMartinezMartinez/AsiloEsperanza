@@ -1,111 +1,225 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Pressable } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, Button, StyleSheet, FlatList, Modal,Alert } from 'react-native';
+import firebase from '../database/firebase'; // Aseg鷕ate de que la ruta sea correcta
 
 const GestionPacientes = () => {
- //array y llena los datos de la tabla
-  const pacientes = [
-    { nombre: 'Juan', edad: 73, dui: '02568794-3', direccion: 'Direcci贸n 1', peso: 70, contacto: 'Contacto 1', telContacto: '1111111' },
-    { nombre: 'Mar铆a', edad: 70, dui: '89748562-8', direccion: 'Direcci贸n 2', peso: 65, contacto: 'Contacto 2', telContacto: '2222222' },
-  ];
-// nos retorna a la vista
+  const [pacientes, setPacientes] = useState([]);
+  const [search, setSearch] = useState('');
+  const [pacientesOriginal, setPacientesOriginal] = useState([]);
+  const [editingPatient, setEditingPatient] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+
+  useEffect(() => {
+    fetchPacientes();
+  }, []);
+
+  const fetchPacientes = async () => {
+    const snapshot = await firebase.db.collection('Paciente').get();
+    const pacientesList = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    setPacientes(pacientesList);
+    setPacientesOriginal(pacientesList);
+  };
+
+  const handleSearch = () => {
+    const filteredPacientes = pacientesOriginal.filter(paciente => 
+      paciente.nombre.toLowerCase().includes(search.toLowerCase()) ||
+      (paciente.dui && paciente.dui.includes(search))
+    );
+    setPacientes(filteredPacientes);
+  };
+
+  const handleEdit = (id) => {
+    const patientToEdit = pacientes.find(patient => patient.id === id);
+    setEditingPatient(patientToEdit);
+    setModalVisible(true);
+  };
+
+  const handleSaveEdit = async () => {
+    try {
+      // Verificar si el DUI ya existe en la base de datos
+      const querySnapshot = await firebase.db.collection('Paciente').where('dui', '==', editingPatient.dui).get();
+      if (!querySnapshot.empty) {
+        // El DUI ya existe, mostrar mensaje de error
+        Alert.alert(
+          'Error',
+          'Ya existe un paciente con este DUI',
+          [{ text: 'Aceptar', onPress: () => console.log('Aceptar') }],
+          { cancelable: false }
+        );
+        return;
+      }
+  
+      // El DUI no existe, proceder con la actualizacion del paciente
+      await firebase.db.collection('Paciente').doc(editingPatient.id).update(editingPatient);
+      fetchPacientes(); // Actualiza la lista despues de guardar los cambios
+      setModalVisible(false); // Cierra el modal despues de guardar
+    } catch (error) {
+      console.error('Error al guardar cambios:', error);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    // Aqui puedes implementar la logica para eliminar el paciente con el ID proporcionado
+    try {
+      await firebase.db.collection('Paciente').doc(id).delete();
+      fetchPacientes(); // Actualiza la lista despues de eliminar el paciente
+    } catch (error) {
+      console.error('Error al eliminar paciente:', error);
+    }
+  };
+  
+  
+
+  const handleCancelEdit = () => {
+    setModalVisible(false);
+  };
+
   return (
-    <View>
-      <View style={styles.container}>
-        <Text style={{ marginBottom: 10, fontWeight: 'bold' }}>Condici贸n m茅dica:</Text>
-        <TextInput style={styles.input} />
-        <Text style={{ marginBottom: 10, fontWeight: 'bold' }}>Fecha de creaci贸n:</Text>
-        <TextInput style={styles.input} />
-        <Text style={{ marginBottom: 10, fontWeight: 'bold' }}>Estado:</Text>
-        <TextInput style={styles.input} />
-      
-        <Pressable style={styles.button} onPress={() => {}}>
-          <Text style={styles.text}>Filtrar</Text>
-        </Pressable>
-      </View>
-      <View style={styles.container}>
-        <Text style={{ marginBottom: 10, fontWeight: 'bold' }}>Lista de pacientes:</Text>
-        <View style={styles.tableHeader}>
-          <Text style={styles.columnHeader}>Nombre</Text>
-          <Text style={styles.columnHeader}>Edad</Text>
-          <Text style={styles.columnHeader}>DUI</Text>
-          <Text style={styles.columnHeader}>Direcci贸n</Text>
-          <Text style={styles.columnHeader}>Peso</Text>
-          <Text style={styles.columnHeader}>Contacto</Text>
-          <Text style={styles.columnHeader}>Tel茅fono contacto</Text>
-        </View>
-        {pacientes.map((paciente, index) => (
-          <View key={index} style={styles.tableRow}>
-            <Text style={styles.columnData}>{paciente.nombre}</Text>
-            <Text style={styles.columnData}>{paciente.edad}</Text>
-            <Text style={styles.columnData}>{paciente.dui}</Text>
-            <Text style={styles.columnData}>{paciente.direccion}</Text>
-            <Text style={styles.columnData}>{paciente.peso}</Text>
-            <Text style={styles.columnData}>{paciente.contacto}</Text>
-            <Text style={styles.columnData}>{paciente.telContacto}</Text>
+    <View style={styles.container}>
+      <TextInput
+        style={styles.input}
+        placeholder="Buscar por nombre o DUI"
+        value={search}
+        onChangeText={setSearch}
+      />
+      <Button title="Buscar" onPress={handleSearch} />
+
+      <FlatList
+        data={pacientes}
+        keyExtractor={item => item.id}
+        renderItem={({ item }) => (
+          <View style={styles.patientItem}>
+            <Text>Nombre: {item.nombre}</Text>
+            <Text>Edad: {item.edad}</Text>
+            <Text>DUI: {item.dui}</Text>
+            <Text>Direccion: {item.direccion}</Text>
+            <Text>Peso: {item.peso}</Text>
+            <Text>Contacto: {item.familiar}</Text>
+            <Text>Telefono Contacto: {item.numero}</Text>
+            <Button title="Editar" onPress={() => handleEdit(item.id)} />
+            <Button title="Eliminar" onPress={() => {
+  Alert.alert(
+    'Confirmar eliminacion',
+    '縀st醩 seguro de que deseas eliminar este paciente?',
+    [
+      { text: 'Cancelar', style: 'cancel' },
+      { text: 'Eliminar', onPress: () => handleDelete(item.id) }
+    ]
+  );
+}} />
           </View>
-        ))}
-      </View>
+        )}
+      />
+
+<Modal
+  visible={modalVisible}
+  animationType="slide"
+  transparent={true}
+  onRequestClose={handleCancelEdit}
+>
+  <View style={styles.modalContainer}>
+    <View style={styles.modalContent}>
+      <Text>Editar Paciente</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Nombre"
+        value={editingPatient ? editingPatient.nombre : ''}
+        onChangeText={(text) => setEditingPatient(prevState => ({ ...prevState, nombre: text }))}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Edad"
+        keyboardType="numeric"
+        value={editingPatient ? editingPatient.edad.toString() : ''}
+        onChangeText={(text) => setEditingPatient(prevState => ({ ...prevState, edad: parseInt(text) || 0 }))}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="DUI"
+        value={editingPatient ? editingPatient.dui : ''}
+        onChangeText={(text) => setEditingPatient(prevState => ({ ...prevState, dui: text }))}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Direccion"
+        value={editingPatient ? editingPatient.direccion : ''}
+        onChangeText={(text) => setEditingPatient(prevState => ({ ...prevState, direccion: text }))}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Peso"
+        keyboardType="numeric"
+        value={editingPatient ? editingPatient.peso.toString() : ''}
+        onChangeText={(text) => setEditingPatient(prevState => ({ ...prevState, peso: parseFloat(text) || 0 }))}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Contacto del Familiar"
+        value={editingPatient ? editingPatient.familiar : ''}
+        onChangeText={(text) => setEditingPatient(prevState => ({ ...prevState, familiar: text }))}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Telefono de Contacto"
+        keyboardType="phone-pad"
+        value={editingPatient ? editingPatient.numero : ''}
+        onChangeText={(text) => setEditingPatient(prevState => ({ ...prevState, numero: text }))}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Estado"
+        value={editingPatient ? editingPatient.estado : ''}
+        onChangeText={(text) => setEditingPatient(prevState => ({ ...prevState, estado: text }))}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Condicion"
+        value={editingPatient ? editingPatient.condicion : ''}
+        onChangeText={(text) => setEditingPatient(prevState => ({ ...prevState, condicion: text }))}
+      />
+      <Button title="Guardar" onPress={handleSaveEdit} />
+      <Button title="Cancelar" onPress={handleCancelEdit} />
+    </View>
+  </View>
+</Modal>
+
+
     </View>
   );
-}
-//estilos
+};
+
 const styles = StyleSheet.create({
   container: {
-    paddingTop:20,
+    paddingTop: 20,
     paddingHorizontal: 20,
   },
   input: {
     height: 40,
-    borderWidth: 3,
-    borderColor: 'orange',
-    borderRadius: 10,
-    marginBottom: 15,
-    backgroundColor: 'white',
+    borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 5,
+    marginBottom: 10,
     paddingHorizontal: 10,
   },
-  button: {
-    marginTop:15,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 32,
-    borderRadius: 10,
-    elevation: 3,
-    backgroundColor: 'orange',
-  },
-  text: {
-    fontSize: 16,
-    lineHeight: 21,
-    fontWeight: 'bold',
-    letterSpacing: 0.25,
-    color: 'black',
-  },
-  tableHeader: {
-    flexDirection: 'row',
-    backgroundColor: 'orange',
-    paddingVertical: 8,
-    paddingHorizontal: 4,
-    marginBottom: 4,
-    borderRadius: 8,
-  },
-  columnHeader: {
-    flex: 1,
-    fontWeight: 'bold',
-    color: 'white',
-    textAlign: 'center',
-  },
-  tableRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 4,
+  patientItem: {
+    padding: 10,
     borderBottomWidth: 1,
-    borderBottomColor: 'orange',
+    borderBottomColor: 'gray',
   },
-  columnData: {
+  modalContainer: {
     flex: 1,
-    textAlign: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    elevation: 5,
   },
 });
 

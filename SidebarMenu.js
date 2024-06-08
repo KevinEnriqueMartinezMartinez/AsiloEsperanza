@@ -84,9 +84,11 @@ const navigateToDetalleCita= () =>{
       <TouchableOpacity style={styles.menuItem} onPress={navigateToHistorialCita}>
         <Text style={styles.menuText}>Historial Cita</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.menuItem} onPress={navigateToDetalleCita}>
-        <Text style={styles.menuText}>Detalle Cita</Text>
-      </TouchableOpacity>
+{/*
+  <TouchableOpacity style={styles.menuItem} onPress={navigateToDetalleCita}>
+    <Text style={styles.menuText}>Detalle Cita</Text>
+  </TouchableOpacity>
+*/}
       <TouchableOpacity style={styles.menuItem} onPress={navigateCerrarSession}>
         <Text style={styles.menuText}>Cerrar Sesion</Text>
       </TouchableOpacity>
