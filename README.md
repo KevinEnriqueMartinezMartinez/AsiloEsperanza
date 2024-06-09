@@ -2,6 +2,24 @@
 
 Este proyecto es una aplicación desarrollada con React Native y Expo para gestionar pacientes, doctores y citas en un asilo. Utiliza Firebase como base de datos en la nube.
 
+## Enlaces Importantes
+
+### Manual Técnico
+El Manual Técnico proporciona una descripción detallada de la arquitectura del sistema, los componentes clave y su integración. Puedes acceder al manual utilizando el siguiente enlace:
+[Manual Técnico](https://udbedu-my.sharepoint.com/:w:/g/personal/lr230079_alumno_udb_edu_sv/Eb6BICqOkoxNva5R8dswRj4BMgv8stGMhmqqodg4E2x76A?e=nb3Clf)
+
+### Manual del Programador
+El Manual del Programador incluye instrucciones detalladas para la configuración del entorno de desarrollo, las dependencias del proyecto y las guías de codificación. Puedes acceder al manual utilizando el siguiente enlace:
+[Manual del Programador](https://udbedu-my.sharepoint.com/:w:/g/personal/lr230079_alumno_udb_edu_sv/Ed8Y4IHivrlPunr6roFylsMBk3UQ82d8mSfC3k1UUFcYsA?e=sYaYbK)
+
+### Mockups
+Para visualizar los mockups del diseño de la interfaz de usuario, puedes acceder al proyecto de Figma en el siguiente enlace:
+[Mockups en Figma](https://www.figma.com/design/agESDXb2sEYOZINj3owBnW/DB?node-id=0-1&t=tCn2BcnU00stAunJ-1)
+
+### Video de YouTube
+También hemos preparado un video en YouTube que muestra una vista general del proyecto y sus funcionalidades principales. Puedes verlo en el siguiente enlace:
+[Video de YouTube](https://www.youtube.com/watch?v=wLyDXM_Exeg)
+
 ## Estructura del Proyecto
 
 El proyecto está organizado de la siguiente manera:
